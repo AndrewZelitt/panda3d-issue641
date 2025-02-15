@@ -16,6 +16,12 @@
 #if defined(_MSC_VER) && _MSC_VER < 1700
 #define fma(a, b, c) ((a) * (b) + (c))
 #endif
+#ifdef _WIN32
+  #include "winbase.h"
+#endif
+#ifdef __APPLE__
+  #include IOPMLib.h
+#endif
 
 TypeHandle InputDevice::_type_handle;
 
@@ -58,7 +64,24 @@ poll() {
 bool InputDevice::
 has_button_event() const {
   LightMutexHolder holder(_lock);
-  return !_button_events.is_null() && _button_events->get_num_events() > 0;
+  //whenever there is a button event, reset the sleep timer if on windows.
+  if (!_button_events.is_null() && _button_events->get_num_events() > 0){
+    #ifdef _WIN32
+      SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
+    #endif
+    //for linux
+    #ifdef linux
+      //XresetScreenSaver();
+    #endif
+    //for macos
+    #ifdef __APPLE__
+      IOPMAssertionID assertionID; 
+      IOPMAssertionDeclareUserActivity(CFSTR(""), kIOPMUserActiveLocal, &assertionID);
+    #endif
+    return 1;
+  }
+//original code
+ // return !_button_events.is_null() && _button_events->get_num_events() > 0;
 }
 
 /**

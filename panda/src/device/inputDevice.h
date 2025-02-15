@@ -28,7 +28,12 @@
 #include "pvector.h"
 #include "lightMutex.h"
 #include "lightMutexHolder.h"
-
+#ifdef _WIN32
+  #include "winbase.h"
+#endif
+#ifdef __APPLE__
+  #include IOPMLib.h
+#endif
 /**
  * This is a structure representing a single input device.  Input devices may
  * have zero or more buttons, pointers, or axes associated with them, and
