@@ -19,9 +19,6 @@
 #ifdef _WIN32
   #include "winbase.h"
 #endif
-#ifdef __APPLE__
-  #include IOPMLib.h
-#endif
 
 TypeHandle InputDevice::_type_handle;
 
@@ -69,15 +66,7 @@ has_button_event() const {
     #ifdef _WIN32
       SetThreadExecutionState(ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED);
     #endif
-    //for linux
-    #ifdef linux
-      //XresetScreenSaver();
-    #endif
     //for macos
-    #ifdef __APPLE__
-      IOPMAssertionID assertionID; 
-      IOPMAssertionDeclareUserActivity(CFSTR(""), kIOPMUserActiveLocal, &assertionID);
-    #endif
     return 1;
   }
 //original code
